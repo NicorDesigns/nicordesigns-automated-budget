@@ -6,6 +6,7 @@ import java.util.List;
 
 @SuppressWarnings("unchecked")
 public class Categorization implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     protected Merchant merchant;

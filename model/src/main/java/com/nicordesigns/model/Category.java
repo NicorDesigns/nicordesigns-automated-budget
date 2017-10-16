@@ -15,7 +15,6 @@ import java.util.Set;
 public class Category implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    public String categoryName;
 
     @Id
     public String id;
@@ -24,18 +23,42 @@ public class Category implements Serializable {
     @ManyToMany
     private Set<Account> accounts = new HashSet<>();
 
+    protected String categoryName;
+
+    protected String contextType;
+
+    protected String scheduleC;
+
+
     public Category() {
+    }
+
+    public Category(Account account, String name, String id) {
+        this.id = id;
+        this.categoryName = name;
+        this.accounts.add(account);
     }
 
     public Category(String name, String id) {
         this.categoryName = name;
         this.id = id;
     }
+    public String getContextType() {
+        return contextType;
+    }
 
-    public Category(Account account, String name, String id) {
-        this.categoryName = name;
-        this.id = id;
-        this.accounts.add(account);
+    public void setContextType(String contextType) {
+        this.contextType = contextType;
+    }
+    public String getScheduleC() {
+        return scheduleC;
+    }
+    public void setScheduleC(String scheduleC) {
+        this.scheduleC = scheduleC;
+    }
+
+    public void setAccounts(Set<Account> accounts) {
+        this.accounts = accounts;
     }
 
     public Set<Account> getAccounts() {
