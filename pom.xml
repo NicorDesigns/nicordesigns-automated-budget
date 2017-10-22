@@ -6,7 +6,6 @@
 
     <modules>
         <module>model</module>
-        <module>import-data</module>
     </modules>
 
     <groupId>com.nicordesign.finance</groupId>
