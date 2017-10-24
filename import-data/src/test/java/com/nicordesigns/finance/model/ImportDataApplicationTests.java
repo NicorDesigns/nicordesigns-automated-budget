@@ -1,4 +1,4 @@
-package com.nicordesigns.finance.importdata;
+package com.nicordesigns.finance.model;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

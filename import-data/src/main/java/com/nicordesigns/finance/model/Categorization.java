@@ -1,10 +1,8 @@
-package com.nicordesigns.finanance.model;
+package com.nicordesigns.finance.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 @SuppressWarnings("unchecked")
 @Entity

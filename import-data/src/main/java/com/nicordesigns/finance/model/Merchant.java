@@ -1,4 +1,4 @@
-package com.nicordesigns.finanance.model;
+package com.nicordesigns.finance.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
