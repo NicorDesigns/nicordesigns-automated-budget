@@ -6,6 +6,7 @@
         <groupId>com.nicordesign.finance</groupId>
         <artifactId>automated-budget</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath></relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
