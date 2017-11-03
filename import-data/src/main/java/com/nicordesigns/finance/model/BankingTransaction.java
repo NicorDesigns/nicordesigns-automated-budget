@@ -26,7 +26,7 @@ public class BankingTransaction implements Serializable {
     protected BigDecimal amount;
     protected Categorization categorization;
 
-    private BankingTransaction() {
+    BankingTransaction() {
     }
 
     public long getId() {
