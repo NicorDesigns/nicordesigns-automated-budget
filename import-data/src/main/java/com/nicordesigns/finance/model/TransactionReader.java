@@ -4,9 +4,11 @@ package com.nicordesigns.finance.model;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -32,6 +34,8 @@ public class TransactionReader implements CommandLineRunner {
     private static String startTxnDate;
     private static String endTxnDate;
 
+    @Autowired
+    BankingTransactionRepository bankingTransactionRepository;
 
     public static String getInputCsvFile() {
         return inputCsvFile;
@@ -94,6 +98,8 @@ public class TransactionReader implements CommandLineRunner {
                     options);
         } catch (Exception e) {
             LOG.error("Exception : ", e);
+        } finally {
+            persistBankingTransactions();
         }
     }
 
@@ -152,6 +158,7 @@ public class TransactionReader implements CommandLineRunner {
                     e.printStackTrace();
                 }
             }
+
         }
 
     }
@@ -234,5 +241,12 @@ public class TransactionReader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         main(args);
+    }
+
+    static void persistBankingTransactions() {
+        LOG.info("persistBankingTransaction called");
+        for (BankingTransaction bankingTransaction : csvTransactions) {
+            LOG.info(bankingTransaction.toString());
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.nicordesigns.finance.model;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -24,7 +25,17 @@ public class BankingTransaction implements Serializable {
 
     protected Calendar postedDate;
     protected BigDecimal amount;
+
+    @ManyToOne
     protected Categorization categorization;
+
+    public BankingTransaction(String payeeName, String memo, String type, Calendar postedDate, BigDecimal amount) {
+        this.payeeName = payeeName;
+        this.memo = memo;
+        this.type = type;
+        this.postedDate = postedDate;
+        this.amount = amount;
+    }
 
     BankingTransaction() {
     }
@@ -99,6 +110,21 @@ public class BankingTransaction implements Serializable {
 
     public void setCategorization(Categorization value) {
         this.categorization = value;
+    }
+
+    @Override
+    public String toString() {
+        return "BankingTransaction{" +
+                "id=" + id +
+                ", institutionTransactionId='" + institutionTransactionId + '\'' +
+                ", checkNumber='" + checkNumber + '\'' +
+                ", payeeName='" + payeeName + '\'' +
+                ", memo='" + memo + '\'' +
+                ", type='" + type + '\'' +
+                ", postedDate=" + postedDate +
+                ", amount=" + amount +
+                ", categorization=" + categorization +
+                '}';
     }
 }
 
