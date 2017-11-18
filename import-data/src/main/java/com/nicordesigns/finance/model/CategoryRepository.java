@@ -8,5 +8,4 @@ public interface CategoryRepository extends Repository<Category, String> {
 
     Collection<Category> findByCategoryName(String categoryName);
 
-
 }
