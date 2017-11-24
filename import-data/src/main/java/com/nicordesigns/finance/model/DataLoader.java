@@ -67,6 +67,8 @@ public class DataLoader {
 
         BankingTransaction bankingTransaction = new BankingTransaction("Esso", "Esso", "Type", Calendar.getInstance(), BigDecimal.valueOf(2000.00));
         bankingTransaction.setCategorization(categorization);
+
+
         bankingTransactionRepository.save(bankingTransaction);
 
     }

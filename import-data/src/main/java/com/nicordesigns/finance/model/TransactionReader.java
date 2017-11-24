@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -27,42 +26,33 @@ import java.util.*;
 public class TransactionReader implements CommandLineRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransactionReader.class);
-    private static List<BankingTransaction> csvTransactions = null;
-    private static BigDecimal availableBalance;
-    private static BigDecimal ledgerBalance;
-    private static String inputCsvFile;
-    private static String startTxnDate;
-    private static String endTxnDate;
 
     @Autowired
-    BankingTransactionRepository bankingTransactionRepository;
+    private static BankingTransactionRepository bankingTransactionRepository;
+    private List<BankingTransaction> csvTransactionList;
+    private BigDecimal availableBalance;
+    private BigDecimal ledgerBalance;
+    private String inputCsvFile;
+    private String startTxnDate;
+    private String endTxnDate;
 
-    public static String getInputCsvFile() {
-        return inputCsvFile;
+    @Autowired
+    public TransactionReader(BankingTransactionRepository bankingTransactionRepository) {
+        this.bankingTransactionRepository = bankingTransactionRepository;
     }
 
-    public static void setInputCsvFile(String inputCsvFile) {
-        TransactionReader.inputCsvFile = inputCsvFile;
+    public TransactionReader() {
+
     }
 
-    public static String getStartTxnDate() {
-        return startTxnDate;
-    }
-
-    public static void setStartTxnDate(String startTxnDate) {
-        TransactionReader.startTxnDate = startTxnDate;
-    }
-
-    public static String getEndTxnDate() {
-        return endTxnDate;
-    }
-
-    public static void setEndTxnDate(String endTxnDate) {
-        TransactionReader.endTxnDate = endTxnDate;
-    }
+    //private BankingTransactionRepository bankingTransactionRepository;
 
     public static void main(String[] args) {
         LOG.info(String.format("ImportDataApplication.main(%s)", Arrays.toString(args)));
+
+
+        TransactionReader transactionReader = new TransactionReader(bankingTransactionRepository);
+
         CommandLineParser parser = new DefaultParser();
         Options options = new Options();
         options.addOption("C", "Credit Union", false, "use file downloaded from Credit Union");
@@ -76,20 +66,28 @@ public class TransactionReader implements CommandLineRunner {
             LOG.info(String.format("numArgs=(%s)", numArgs));
 
             if (numArgs ==  3) {
-                setInputCsvFile(commandLine.getArgs()[0]);
-                setStartTxnDate(commandLine.getArgs()[1]);
-                setEndTxnDate(commandLine.getArgs()[2]);
+                transactionReader.setInputCsvFile(commandLine.getArgs()[0]);
+                transactionReader.setStartTxnDate(commandLine.getArgs()[1]);
+                transactionReader.setEndTxnDate(commandLine.getArgs()[2]);
+                transactionReader.setCsvTransactionList(new ArrayList<BankingTransaction>());
+                transactionReader.getCsvTransactionList().size();
             } else {
                 throw new ParseException("please specify all required options", 0);
             }
 
             if (commandLine.hasOption("C")) {
-                populateAccountTransactionsFromCSV();
+                transactionReader.populateAccountTransactionsFromCSV();
             } else if (commandLine.hasOption("Q")) {
-                populateAccountTransactionsFromCSV();
+                transactionReader.populateAccountTransactionsFromCSV();
             } else {
                 throw new ParseException("unknown option " + commandLine.getOptions()[0].getOpt(), 0);
             }
+
+            LOG.info("persistBankingTransaction called");
+            for (BankingTransaction bankingTransaction : transactionReader.getCsvTransactionList()) {
+                LOG.info(bankingTransaction.toString());
+            }
+
         } catch (ParseException e) {
             HelpFormatter helpFormatter = new HelpFormatter();
             helpFormatter.setWidth(120);
@@ -99,11 +97,45 @@ public class TransactionReader implements CommandLineRunner {
         } catch (Exception e) {
             LOG.error("Exception : ", e);
         } finally {
-            persistBankingTransactions();
+
         }
+
+
     }
 
-    public static void populateAccountTransactionsFromCSV() {
+    public List<BankingTransaction> getCsvTransactionList() {
+        return csvTransactionList;
+    }
+
+    public void setCsvTransactionList(List<BankingTransaction> csvTransactionList) {
+        this.csvTransactionList = csvTransactionList;
+    }
+
+    public String getInputCsvFile() {
+        return inputCsvFile;
+    }
+
+    public void setInputCsvFile(String inputCsvFile) {
+        this.inputCsvFile = inputCsvFile;
+    }
+
+    public String getStartTxnDate() {
+        return startTxnDate;
+    }
+
+    public void setStartTxnDate(String startTxnDate) {
+        this.startTxnDate = startTxnDate;
+    }
+
+    public String getEndTxnDate() {
+        return endTxnDate;
+    }
+
+    public void setEndTxnDate(String endTxnDate) {
+        this.endTxnDate = endTxnDate;
+    }
+
+    public void populateAccountTransactionsFromCSV() {
 
         String csvFile = getInputCsvFile();
 
@@ -116,7 +148,6 @@ public class TransactionReader implements CommandLineRunner {
 
             br = new BufferedReader(new FileReader(csvFile));
             int rowCount = 0;
-            csvTransactions = new ArrayList<>();
 
 
             while ((line = br.readLine()) != null) {
@@ -140,10 +171,6 @@ public class TransactionReader implements CommandLineRunner {
                 //storeBalanceFields(strings);
             }
 
-
-            LOG.info("csvTransactions.size() = " + csvTransactions.size());
-
-
         } catch (ParseException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
@@ -164,7 +191,7 @@ public class TransactionReader implements CommandLineRunner {
     }
 
 
-    private static void populateBankingTransactionList(String[] strings) throws ParseException {
+    private void populateBankingTransactionList(String[] strings) throws ParseException {
 
         BankingTransaction bankingTransaction;
 
@@ -216,12 +243,12 @@ public class TransactionReader implements CommandLineRunner {
 
             if (bankingTransaction.getPostedDate().after(startCalendar) && bankingTransaction.getPostedDate().before(endCalendar)) {
                 System.out.println("Transaction Name: " + strings[5]);
-                csvTransactions.add(bankingTransaction);
+                csvTransactionList.add(bankingTransaction);
             }
         }
     }
 
-    private static void storeBalanceFields(String[] strings) throws ParseException {
+    private void storeBalanceFields(String[] strings) throws ParseException {
         if (strings[0].contains("AVAILABLE BALANCE")) { //This is to work out the available amount of cash
 
             DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getNumberInstance(Locale.US);
@@ -243,10 +270,5 @@ public class TransactionReader implements CommandLineRunner {
         main(args);
     }
 
-    static void persistBankingTransactions() {
-        LOG.info("persistBankingTransaction called");
-        for (BankingTransaction bankingTransaction : csvTransactions) {
-            LOG.info(bankingTransaction.toString());
-        }
-    }
+
 }
