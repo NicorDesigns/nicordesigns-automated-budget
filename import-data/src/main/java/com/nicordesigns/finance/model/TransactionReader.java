@@ -23,12 +23,14 @@ import java.time.temporal.TemporalAccessor;
 import java.util.*;
 
 @Component
-public class TransactionReader implements CommandLineRunner {
+public class TransactionReader extends CsvReader implements CommandLineRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransactionReader.class);
 
     @Autowired
     private static BankingTransactionRepository bankingTransactionRepository;
+
+
     private List<BankingTransaction> csvTransactionList;
     private BigDecimal availableBalance;
     private BigDecimal ledgerBalance;
@@ -45,7 +47,6 @@ public class TransactionReader implements CommandLineRunner {
 
     }
 
-    //private BankingTransactionRepository bankingTransactionRepository;
 
     public static void main(String[] args) {
         LOG.info(String.format("ImportDataApplication.main(%s)", Arrays.toString(args)));
@@ -70,7 +71,6 @@ public class TransactionReader implements CommandLineRunner {
                 transactionReader.setStartTxnDate(commandLine.getArgs()[1]);
                 transactionReader.setEndTxnDate(commandLine.getArgs()[2]);
                 transactionReader.setCsvTransactionList(new ArrayList<BankingTransaction>());
-                transactionReader.getCsvTransactionList().size();
             } else {
                 throw new ParseException("please specify all required options", 0);
             }
